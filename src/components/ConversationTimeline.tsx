@@ -36,44 +36,49 @@ export function ConversationTimeline({ prospect }: { prospect: Prospect }) {
   });
   const { addConversation } = useProspectStore();
   
-  const handleAddConversation = async () => {
-    if (!newConversation.message.trim()) {
-      toast.error('Please enter a message');
-      return;
-    }
-    
-    const sentiment = newConversation.replied 
-      ? analyzeSentiment(newConversation.reply_message)
-      : null;
-    
-    const conversation: Conversation = {
-      id: generateId(),
-      contact_id: prospect.contacts[0].id,
-      date: new Date().toISOString(),
-      channel: newConversation.channel,
-      message: newConversation.message,
-      replied: newConversation.replied,
-      reply_message: newConversation.replied ? newConversation.reply_message : undefined,
-      sentiment,
-      ai_insights: newConversation.replied 
-        ? generateAIInsights(prospect, { 
-            ...conversation, 
-            sentiment, 
-            reply_message: newConversation.reply_message 
-          } as Conversation)
-        : undefined
-    };
-    
-    await addConversation(prospect.id, conversation);
-    setShowAddForm(false);
-    setNewConversation({
-      channel: 'email',
-      message: '',
-      replied: false,
-      reply_message: ''
-    });
-    toast.success('Conversation added');
+const handleAddConversation = async () => {
+  if (!newConversation.message.trim()) {
+    toast.error('Please enter a message');
+    return;
+  }
+  
+  const sentiment = newConversation.replied 
+    ? analyzeSentiment(newConversation.reply_message)
+    : null;
+  
+  // Create a temporary conversation object for AI insights
+  const tempConversation: Conversation = {
+    id: generateId(),
+    contact_id: prospect.contacts[0].id,
+    date: new Date().toISOString(),
+    channel: newConversation.channel,
+    message: newConversation.message,
+    replied: newConversation.replied,
+    reply_message: newConversation.replied ? newConversation.reply_message : undefined,
+    sentiment,
   };
+  
+  // Generate AI insights after the conversation object is created
+  const aiInsights = newConversation.replied 
+    ? generateAIInsights(prospect, tempConversation)
+    : undefined;
+  
+  // Final conversation object with AI insights
+  const conversation: Conversation = {
+    ...tempConversation,
+    ai_insights: aiInsights
+  };
+  
+  await addConversation(prospect.id, conversation);
+  setShowAddForm(false);
+  setNewConversation({
+    channel: 'email',
+    message: '',
+    replied: false,
+    reply_message: ''
+  });
+  toast.success('Conversation added');
+};
   
   return (
     <div className="space-y-4">
