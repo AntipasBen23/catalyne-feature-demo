@@ -174,11 +174,10 @@ function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const { prospects } = useProspectStore();
   const { currentView } = useUIStore();
   
-  const viewTitles = {
+  const viewTitles: Record<'dashboard' | 'list' | 'pipeline', string> = {
     dashboard: 'Dashboard',
     list: 'List View',
     pipeline: 'Pipeline Board',
-    calendar: 'Calendar View',
   };
   
   const activePending = prospects.reduce((sum, p) => {

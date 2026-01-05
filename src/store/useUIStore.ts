@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type View = 'pipeline' | 'list' | 'calendar';
+type View = 'pipeline' | 'list' | 'dashboard';
 
 interface UIStore {
   // State
@@ -27,7 +27,7 @@ interface UIStore {
 export const useUIStore = create<UIStore>((set, get) => ({
   // Initial state
   sidebarOpen: true,
-  currentView: 'pipeline',
+  currentView: 'dashboard',
   showAIAssistant: false,
   notifications: [],
   
